@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+
+    <title>ToDo List</title>
+  </head>
+  <style>
+    .form-group {
+      font-size: 25px;
+    }
+  </style>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="ToDo.html">ToDo</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="ToDo.html"
+              >Home <span class="sr-only">(current)</span></a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="ToDo.html">Add a ToDo</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="ToDo.html">Contact</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container my-5">
+      <h1 class="text-center" style="font-size: 35px"><u>ToDo List</u></h1>
+      <div class="form-group">
+        <label for="ToDo">Task</label>
+        <input
+          type="text"
+          class="form-control"
+          id="task"
+          placeholder="Enter a task"
+        />
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-control" id="description" rows="3"></textarea>
+      </div>
+      <button type="submit" id="add" class="btn btn-primary">
+        Add to List
+      </button>
+      <button
+        type="submit"
+        id="clear"
+        class="btn btn-primary"
+        onclick="cleartasks()"
+      >
+        Clear all Tasks
+      </button>
+      <div id="items" class="my-5">
+        <h2 style="font-size: 25px">Your Tasks</h2>
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">No.</th>
+              <th scope="col">Task</th>
+              <th scope="col">Description</th>
+              <th scope="col">Delete</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <th scope="row">Example</th>
+              <td>Black Coffee</td>
+              <td>Add Coffee Powder to boiling water.</td>
+              <td>
+                <button class="btn btn-sm btn-primary" onclick="deleted()">
+                  Delete Task
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+      let add = document.getElementById("add");
+      add.addEventListener("click", addtask);
+      localStorage.clear();
+      function addtask() {
+        console.log("Updating List");
+        task = document.getElementById("task").value;
+        desc = document.getElementById("description").value;
+        if (task == "") {
+          alert("Please fill in all the fields");
+          console.log("Empty field");
+        } else {
+          if (localStorage.getItem("itemsJson") == null) {
+            itemJsonArray = [];
+            itemJsonArray.push([task, desc]);
+            localStorage.setItem("itemsJson", JSON.stringify(itemJsonArray));
+          } else {
+            itemJsonArrayStr = localStorage.getItem("itemsJson");
+            itemJsonArray = JSON.parse(itemJsonArrayStr);
+            itemJsonArray.push([task, desc]);
+            localStorage.setItem("itemsJson", JSON.stringify(itemJsonArray));
+          }
+          let tbody = document.getElementById("tbody");
+          let str = "";
+
+          itemJsonArray.forEach((element, index) => {
+            str += `<tr>
+              <th scope="row">${index + 1}</th>
+              <td>${element[0]}</td>
+              <td>${element[1]}</td>
+              <td><button class="btn btn-sm btn-primary" onclick="deleted(${index})">Delete Task</button></td>
+            </tr>`;
+          });
+          tbody.innerHTML = str;
+          document.getElementById("task").value = "";
+          document.getElementById("description").value = "";
+        }
+      }
+      function deleted(taskIndex) {
+        console.log("Deleted");
+        itemJsonArrayStr = localStorage.getItem("itemsJson");
+        itemJsonArray = JSON.parse(itemJsonArrayStr);
+        itemJsonArray.splice(taskIndex, 1);
+        localStorage.setItem("itemsJson", JSON.stringify(itemJsonArray));
+        update();
+      }
+      function update() {
+        if (localStorage.getItem("itemsJson") == null) {
+          itemJsonArray = [];
+          localStorage.setItem("itemsJson", JSON.stringify(itemJsonArray));
+        } else {
+          itemJsonArrayStr = localStorage.getItem("itemsJson");
+          itemJsonArray = JSON.parse(itemJsonArrayStr);
+          localStorage.setItem("itemsJson", JSON.stringify(itemJsonArray));
+        }
+        let tbody = document.getElementById("tbody");
+        let str = "";
+        itemJsonArray.forEach((element, index) => {
+          if (index == 0) {
+            return;
+          } else {
+            str += `<tr>
+              <th scope="row">${index}</th>
+              <td>${element[0]}</td>
+              <td>${element[1]}</td>
+              <td><button class="btn btn-sm btn-primary" onclick="deleted(${index})">Delete Task</button></td>
+            </tr>`;
+          }
+        });
+        tbody.innerHTML = str;
+      }
+      function cleartasks() {
+        if (confirm("Are you sure you want to clear all your tasks?")) {
+          console.log("Clearing the Local Storage");
+          localStorage.clear();
+          update();
+        }
+      }
+    </script>
+  </body>
+</html>
